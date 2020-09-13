@@ -17,10 +17,18 @@ const host = '127.0.0.1:8080';
 // Load the contents of the web application to be used as the index page
 const indexPage = fs.readFileSync(`dist/${process.env.npm_config_app || 'meetingV2'}.html`);
 
+const AWS_CONFIG = {
+  accessKeyId: 'AKIAYD5OC6FIFY2BJCOY',
+  secretAccessKey: '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',
+  // region: 'ap-southeast-1'
+  region: 'us-east-1'
+};
+
 // Create ans AWS SDK Chime object. Region 'us-east-1' is currently required.
 // Use the MediaRegion property below in CreateMeeting to select the region
 // the meeting is hosted in.
-const chime = new AWS.Chime({ region: 'us-east-1' });
+AWS.config = new AWS.Config(AWS_CONFIG);
+const chime = new AWS.Chime();
 
 // Set the AWS SDK Chime endpoint. The global endpoint is https://service.chime.aws.amazon.com.
 chime.endpoint = new AWS.Endpoint(process.env.ENDPOINT || 'https://service.chime.aws.amazon.com');
@@ -30,7 +38,7 @@ http.createServer({}, async (request, response) => {
   log(`${request.method} ${request.url} BEGIN`);
   try {
     // Enable HTTP compression
-    compression({})(request, response, () => {});
+    compression({})(request, response, () => { });
     const requestUrl = url.parse(request.url, true);
     if (request.method === 'GET' && requestUrl.pathname === '/') {
       // Return the contents of the index page
